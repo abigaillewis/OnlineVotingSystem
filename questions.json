@@ -1,0 +1,32 @@
+{
+    "1" : {
+        "question" : "What is your favourite colour?",
+        "option1" : "Red",
+        "option2" : "Green",
+        "option3" : "Blue",
+        "endDate" : "20",
+        "endMonth" : "8",
+        "endYear" : "2017",
+        "id" : 1
+    },
+    "2" : {
+        "question" : "What is your favourite fruit?",
+        "option1" : "Apple",
+        "option2" : "Orange",
+        "option3" : "Banana",
+        "endDate" : "20",
+        "endMonth" : "10",
+        "endYear" : "2017",
+        "id" : 2
+    },
+    "3" : {
+        "question" : "What is your favourite animal?",
+        "option1" : "Cat",
+        "option2" : "Dog",
+        "option3" : "Hamster",
+        "endDate" : "1",
+        "endMonth" : "6",
+        "endYear" : "2017",
+        "id" : 3
+    }
+}

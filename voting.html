@@ -1,0 +1,119 @@
+
+<html>
+    <head>
+        <title>Voting</title>
+
+        <!-- Links to bootstrap -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+        <!-- Link to own style sheet -->
+        <link rel="stylesheet" href="css/style.css">
+
+        <!-- Link to jQuery -->
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+        <!-- Link to socket.io -->
+        <script src ="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+
+        <script>
+            // Reads data from json file
+            $.getJSON("questions.json", function (data) {
+                // Gets date that voting closes
+                var endDate = data[1]["endDate"];
+                var endMonth = data[1]["endMonth"];
+                var endYear = data[1]["endYear"];
+
+                // Gets current date
+                var today = new Date();
+                var date = today.getDate();
+                var month = today.getMonth()+1;
+                var year = today.getFullYear();
+                
+                // Checks to see if voting has closed
+                if ((year > endYear) || (month > endMonth && year === endYear) || (date > endDate && month === endMonth && year === endYear)) {
+                    // If voting has closed select radio buttons to be disabled
+                    var radioButtons = document.form.answer;
+                    // Disable each radio button
+                    for (var i=0, iLen=radioButtons.length; i<iLen; i++) {
+                      radioButtons[i].disabled = true;
+                    }
+                    // Disable submit button
+                    document.getElementById("submit").disabled = true;
+                    // Disable message to user informing them that they can no longer vote as voting has closed
+                    document.getElementById("errorMessage").append("Voting has closed");         
+                }
+            });
+
+            // Stores radio button that is currently selected
+            var currentSelection=1;
+
+            var iosocket;
+            
+            // Called when user clicks 'submit' button
+            // Sends value representing the option they chose over socket.io
+            function sendVote(){
+                iosocket.send(currentSelection);
+                // Redirects user to results page
+                window.location = "results.html";                
+            }
+
+            // Called when user selects a different radio button
+            // Keeps track of radio button currently selected
+            function changeSelection(id){
+                currentSelection=id;
+            }
+        
+            $(function(){
+                // Connect to socket.io
+                iosocket = io.connect();
+            });
+
+        </script>
+    </head>
+    <body>
+        <!-- Header -->
+        <div class="page-header">
+            <h1>Voting</h1>      
+        </div>     
+
+        <!-- Nav bar -->
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">Online Voting System</a>
+                </div>
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="voting.html">Voting<span class="sr-only">(current)</span></a></li>
+                        <li><a href="results.html">Results</a></li>
+                        <li><a href="about.html">About</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="login.html">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Box to display form and then once form is submited display results -->
+        <div class="text_box">
+            <!-- Empty h4 that will be populated with an error message if voting has closed -->
+            <h4 id="errorMessage"></h4>
+            <!-- Form -->
+            <form id="form" name="form">
+                <h2>What is your favourite colour?</h2>
+                <input type="radio" name="answer" checked onchange="changeSelection(1)"> Red <br>
+                <input type="radio" name="answer" onchange="changeSelection(2)">  Green <br>
+                <input type="radio" name="answer" onchange="changeSelection(3)"> Blue <br>
+                <input type="button" id="submit" value="Submit" onclick="sendVote()">
+            </form>
+        </div>
+
+        <!-- Footer -->
+        <footer class="fixed-bottom">
+            <h3>Abigail Lewis</h3>
+        </footer>
+    </body>
+</html>

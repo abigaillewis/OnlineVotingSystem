@@ -1,0 +1,98 @@
+<html>
+    <head>
+        <title>Results</title>
+
+        <!-- Links to bootstrap -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+        <!-- Link to own style sheet -->
+        <link rel="stylesheet" href="css/style.css">
+
+        <!-- Link to jQuery -->
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+        <!-- Link to socket.io -->
+        <script src ="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+        
+        <script>
+            $.getJSON("questions.json", function (data) {
+                // Gets date that voting closes
+                var endDate = data[1]["endDate"];
+                var endMonth = data[1]["endMonth"];
+                var endYear = data[1]["endYear"];
+
+                // Gets current datw
+                var today = new Date();
+                var date = today.getDate();
+                var month = today.getMonth()+1;
+                var year = today.getFullYear();
+                
+                // Checks to see if voting has closed
+                if ((year > endYear) || (month > endMonth && year === endYear) || (date > endDate && month === endMonth && year === endYear)) {
+                    // If voting has closed display that these results are the final results
+                    $('#title').append($('<p></p>').text("Final voting results:"));    
+                }
+                else {
+                    // If voting is still open display that these results are the final results
+                    $('#title').append($('<p></p>').text("Live voting results:"));   
+                }
+            });
+
+            var iosocket;
+            // Connect to socket.io
+            iosocket = io.connect();
+
+            // Send message to socket.io requesting results
+            iosocket.emit("results");
+
+            // Executed when message is recieved
+            iosocket.on('message', function(message) {
+                // Update value of each option
+                $('#red').text("Red: " + Math.round(message[0]) + "%");
+                $('#green').text("Green: " + Math.round(message[1]) + "%");
+                $('#blue').text("Blue: " + Math.round(message[2]) + "%");
+            });
+        </script>
+    </head>
+    <body>
+        <!-- Header -->
+        <div class="page-header">
+            <h1>Results</h1>          
+        </div>
+
+        <!-- Nav bar -->
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">Online Voting System</a>
+                </div>
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li><a href="voting.html">Voting</a></li>
+                        <li class="active"><a href="results.html">Results<span class="sr-only">(current)</span></a></li>
+                        <li><a href="about.html">About</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                            <li><a href="login.html">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Box to display results -->
+        <div class="text_box">
+            <!-- Empty paragraphs that will be populated with results when results are recieved from server -->
+            <p id="title"></p>
+            <p id="red">Red:</p>
+            <p id="green">Green:</p>
+            <p id="blue">Blue:</p>
+        </div>
+
+        <!-- Footer -->
+        <footer class="fixed-bottom">
+            <h3>Abigail Lewis</h3>
+        </footer>
+    </body>
+</html>
